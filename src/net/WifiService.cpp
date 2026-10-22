@@ -91,7 +91,10 @@ void WifiService::startPortal() {
   const String ssid = String("SLWF-12 setup ") + cfg::settings.chipId();
   const String pass = cfg::settings.wifi.apPassword;
 
-  WiFi.mode(state_ == WifiState::Connecting ? WIFI_AP_STA : WIFI_AP);
+  // Always AP_STA: a scan forces the station interface on, and switching the
+  // mode from AP to AP_STA restarts the access point, dropping whichever phone
+  // just opened the Network page to ask for that scan.
+  WiFi.mode(WIFI_AP_STA);
   WiFi.softAPConfig(kApAddress, kApAddress, IPAddress(255, 255, 255, 0));
 
   const bool ok = pass.length() >= 8 ? WiFi.softAP(ssid.c_str(), pass.c_str())

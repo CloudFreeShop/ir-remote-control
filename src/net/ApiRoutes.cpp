@@ -215,8 +215,10 @@ void handleWifiScan(AsyncWebServerRequest *request) {
   JsonDocument doc;
   JsonArray networks = doc["networks"].to<JsonArray>();
   wifi.scanJson(networks);
-  doc["scanning"] = wifi.scanInProgress();
+  // Start the scan before reporting on it, or the first answer says "not
+  // scanning, no networks" and the page never asks again.
   if (networks.size() == 0 && !wifi.scanInProgress()) wifi.requestScan();
+  doc["scanning"] = wifi.scanInProgress();
   sendJson(request, 200, doc);
 }
 
